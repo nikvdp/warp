@@ -114,48 +114,48 @@ jobs:
           name: warp-runner-${{ matrix.target }}
           path: ${{ github.workspace }}/target/${{ matrix.target }}/release/warp-runner*
 
-  build-warp-runner-linux-aarch64:
-    runs-on: [self-hosted, linux, ARM64]
-    name: Build WR ${{ matrix.target }}
-    needs: [setup]
-    env:
-      CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
-      CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
-    strategy:
-      matrix: 
-        target: [aarch64-unknown-linux-gnu]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.4.0
-
-      - name: Setup target
-        run: rustup target add ${{ matrix.target }} --toolchain stable
-
-      - name: Cache cargo registry
-        uses: actions/cache@v2.1.6
-        continue-on-error: true
-        with:
-          path: ~/.cargo/registry/cache
-          key: ${{ matrix.target }}-warp-runner-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.target }}-warp-runner-cargo-registry-
-                  
-      - name: Set cargo build metadata
-        shell: pwsh
-        run: ./ci/cargo.ps1 -Version ${{ env.CARGO_PKG_VERSION }} -Authors "${{ env.CARGO_PKG_AUTHORS }}"
-      
-      - name: Build 
-        run: |
-         cd ${{ github.workspace }}/warp-runner
-         cargo build --release --target ${{ matrix.target }}
-
-      - name: Upload artifacts
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: warp-runner-${{ matrix.target }}
-          path: ${{ github.workspace }}/target/${{ matrix.target }}/release/warp-runner*
-          
+  # build-warp-runner-linux-aarch64:
+  #   runs-on: [self-hosted, linux, ARM64]
+  #   name: Build WR ${{ matrix.target }}
+  #   needs: [setup]
+  #   env:
+  #     CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
+  #     CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
+  #   strategy:
+  #     matrix: 
+  #       target: [aarch64-unknown-linux-gnu]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2.4.0
+  #
+  #     - name: Setup target
+  #       run: rustup target add ${{ matrix.target }} --toolchain stable
+  #
+  #     - name: Cache cargo registry
+  #       uses: actions/cache@v2.1.6
+  #       continue-on-error: true
+  #       with:
+  #         path: ~/.cargo/registry/cache
+  #         key: ${{ matrix.target }}-warp-runner-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ matrix.target }}-warp-runner-cargo-registry-
+  #                 
+  #     - name: Set cargo build metadata
+  #       shell: pwsh
+  #       run: ./ci/cargo.ps1 -Version ${{ env.CARGO_PKG_VERSION }} -Authors "${{ env.CARGO_PKG_AUTHORS }}"
+  #     
+  #     - name: Build 
+  #       run: |
+  #        cd ${{ github.workspace }}/warp-runner
+  #        cargo build --release --target ${{ matrix.target }}
+  #
+  #     - name: Upload artifacts
+  #       if: success()
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: warp-runner-${{ matrix.target }}
+  #         path: ${{ github.workspace }}/target/${{ matrix.target }}/release/warp-runner*
+  #         
   build-warp-runner-osx:
     runs-on: macos-latest
     name: Build WR x86_64-apple-darwin
@@ -199,7 +199,9 @@ jobs:
   build-warp-packer-windows:
     runs-on: windows-latest
     name: Build WP ${{ matrix.target }}
-    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx]
+    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, 
+      # build-warp-runner-linux-aarch64,
+      build-warp-runner-osx]
     env:
       CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
       CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
@@ -228,11 +230,11 @@ jobs:
           name: warp-runner-x86_64-unknown-linux-gnu
           path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
 
-      - name: Download warp runner (aarch64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-aarch64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
+      # - name: Download warp runner (aarch64-unknown-linux-gnu)
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: warp-runner-aarch64-unknown-linux-gnu
+      #     path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
 
       - name: Download warp runner (x86_64-apple-darwin)
         uses: actions/download-artifact@v2
@@ -271,7 +273,9 @@ jobs:
   build-warp-packer-linux-x64:
     runs-on: ubuntu-latest
     name: Build WP linux-x64
-    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx]
+    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, 
+      # build-warp-runner-linux-aarch64,
+      build-warp-runner-osx]
     env:
       CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
       CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
@@ -297,11 +301,11 @@ jobs:
           name: warp-runner-x86_64-unknown-linux-gnu
           path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
 
-      - name: Download warp runner (aarch64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-aarch64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
+      # - name: Download warp runner (aarch64-unknown-linux-gnu)
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: warp-runner-aarch64-unknown-linux-gnu
+      #     path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
 
       - name: Download warp runner (x86_64-apple-darwin)
         uses: actions/download-artifact@v2
@@ -343,85 +347,87 @@ jobs:
           name: warp-packer-${{ env.RUST_TARGET }}
           path: ${{ github.workspace }}/target/${{ env.RUST_TARGET }}/release/warp-packer*
   
-  build-warp-packer-linux-aarch64:
-    runs-on: [self-hosted, linux, ARM64]
-    name: Build WP linux-aarch64
-    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx]
-    env:
-      CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
-      CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.4.0
-
-      - name: Download warp runner (i686-pc-windows-msvc)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-i686-pc-windows-msvc
-          path: ${{ github.workspace }}/target/i686-pc-windows-msvc/release
-
-      - name: Download warp runner (x86_64-pc-windows-msvc)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-x86_64-pc-windows-msvc
-          path: ${{ github.workspace }}/target/x86_64-pc-windows-msvc/release
-
-      - name: Download warp runner (x86_64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-x86_64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
-
-      - name: Download warp runner (aarch64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-aarch64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
-
-      - name: Download warp runner (x86_64-apple-darwin)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-x86_64-apple-darwin
-          path: ${{ github.workspace }}/target/x86_64-apple-darwin/release
-          
-      - name: Setup aarch64-unknown-linux-gnu
-        run: | 
-          rustup target add aarch64-unknown-linux-gnu --toolchain stable
-          echo "RUST_TARGET=aarch64-unknown-linux-gnu" >> $GITHUB_ENV
-
-      - name: Cache cargo registry
-        uses: actions/cache@v2.1.6
-        continue-on-error: true
-        with:
-          path: ~/.cargo/registry/cache
-          key: ${{ env.RUST_TARGET }}-warp-packer-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ env.RUST_TARGET }}-warp-packer-cargo-registry-
-      
-      - name: Set cargo build metadata
-        shell: pwsh
-        run: ./ci/cargo.ps1 -Version ${{ env.CARGO_PKG_VERSION }} -Authors "${{ env.CARGO_PKG_AUTHORS }}"
-
-      - name: Build 
-        run: |
-         cd ${{ github.workspace }}/warp-packer
-         cargo build --release --target ${{ env.RUST_TARGET }}
-
-      - name: Strip symbols
-        if: github.ref == 'refs/heads/master' 
-        run: strip ${{ github.workspace }}/target/${{ env.RUST_TARGET }}/release/warp-packer
-          
-      - name: Upload artifacts
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: warp-packer-${{ env.RUST_TARGET }}
-          path: ${{ github.workspace }}/target/${{ env.RUST_TARGET }}/release/warp-packer*
-
+  # build-warp-packer-linux-aarch64:
+  #   runs-on: [self-hosted, linux, ARM64]
+  #   name: Build WP linux-aarch64
+  #   needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx]
+  #   env:
+  #     CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
+  #     CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2.4.0
+  #
+  #     - name: Download warp runner (i686-pc-windows-msvc)
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: warp-runner-i686-pc-windows-msvc
+  #         path: ${{ github.workspace }}/target/i686-pc-windows-msvc/release
+  #
+  #     - name: Download warp runner (x86_64-pc-windows-msvc)
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: warp-runner-x86_64-pc-windows-msvc
+  #         path: ${{ github.workspace }}/target/x86_64-pc-windows-msvc/release
+  #
+  #     - name: Download warp runner (x86_64-unknown-linux-gnu)
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: warp-runner-x86_64-unknown-linux-gnu
+  #         path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
+  #
+  #     - name: Download warp runner (aarch64-unknown-linux-gnu)
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: warp-runner-aarch64-unknown-linux-gnu
+  #         path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
+  #
+  #     - name: Download warp runner (x86_64-apple-darwin)
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: warp-runner-x86_64-apple-darwin
+  #         path: ${{ github.workspace }}/target/x86_64-apple-darwin/release
+  #         
+  #     - name: Setup aarch64-unknown-linux-gnu
+  #       run: | 
+  #         rustup target add aarch64-unknown-linux-gnu --toolchain stable
+  #         echo "RUST_TARGET=aarch64-unknown-linux-gnu" >> $GITHUB_ENV
+  #
+  #     - name: Cache cargo registry
+  #       uses: actions/cache@v2.1.6
+  #       continue-on-error: true
+  #       with:
+  #         path: ~/.cargo/registry/cache
+  #         key: ${{ env.RUST_TARGET }}-warp-packer-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ env.RUST_TARGET }}-warp-packer-cargo-registry-
+  #     
+  #     - name: Set cargo build metadata
+  #       shell: pwsh
+  #       run: ./ci/cargo.ps1 -Version ${{ env.CARGO_PKG_VERSION }} -Authors "${{ env.CARGO_PKG_AUTHORS }}"
+  #
+  #     - name: Build 
+  #       run: |
+  #        cd ${{ github.workspace }}/warp-packer
+  #        cargo build --release --target ${{ env.RUST_TARGET }}
+  #
+  #     - name: Strip symbols
+  #       if: github.ref == 'refs/heads/master' 
+  #       run: strip ${{ github.workspace }}/target/${{ env.RUST_TARGET }}/release/warp-packer
+  #         
+  #     - name: Upload artifacts
+  #       if: success()
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: warp-packer-${{ env.RUST_TARGET }}
+  #         path: ${{ github.workspace }}/target/${{ env.RUST_TARGET }}/release/warp-packer*
+  #
   build-warp-packer-macos-x64:
     runs-on: macos-latest
     name: Build WP macos-x64
-    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx]
+    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, 
+      # build-warp-runner-linux-aarch64,
+      build-warp-runner-osx]
     env:
       CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
       CARGO_PKG_AUTHORS: ${{ needs.setup.outputs.CARGO_PKG_AUTHORS }}
@@ -447,11 +453,11 @@ jobs:
           name: warp-runner-x86_64-unknown-linux-gnu
           path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
 
-      - name: Download warp runner (aarch64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-runner-aarch64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
+      # - name: Download warp runner (aarch64-unknown-linux-gnu)
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: warp-runner-aarch64-unknown-linux-gnu
+      #     path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
 
       - name: Download warp runner (x86_64-apple-darwin)
         uses: actions/download-artifact@v2
@@ -497,7 +503,11 @@ jobs:
     runs-on: ubuntu-latest
     if: success() && github.ref == 'refs/heads/master'
     name: Publish release
-    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, build-warp-runner-linux-aarch64, build-warp-runner-osx, build-warp-packer-windows, build-warp-packer-linux-x64, build-warp-packer-linux-aarch64, build-warp-packer-macos-x64]
+    needs: [setup, build-warp-runner-windows, build-warp-runner-linux-x64, 
+      # build-warp-runner-linux-aarch64,
+      build-warp-runner-osx, build-warp-packer-windows, build-warp-packer-linux-x64,
+      # build-warp-packer-linux-aarch64,
+      build-warp-packer-macos-x64]
     env:
       CARGO_PKG_VERSION: ${{ needs.setup.outputs.CARGO_PKG_VERSION }}
     steps:
@@ -520,11 +530,11 @@ jobs:
           name: warp-packer-x86_64-unknown-linux-gnu
           path: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release
 
-      - name: Download warp packer (aarch64-unknown-linux-gnu)
-        uses: actions/download-artifact@v2
-        with:
-          name: warp-packer-aarch64-unknown-linux-gnu
-          path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
+      # - name: Download warp packer (aarch64-unknown-linux-gnu)
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: warp-packer-aarch64-unknown-linux-gnu
+      #     path: ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release
 
       - name: Download warp packer (x86_64-apple-darwin)
         uses: actions/download-artifact@v2
@@ -537,7 +547,7 @@ jobs:
           cp ${{ github.workspace }}/target/i686-pc-windows-msvc/release/warp-packer.exe windows-x86.warp-packer.exe
           cp ${{ github.workspace }}/target/x86_64-pc-windows-msvc/release/warp-packer.exe windows-x64.warp-packer.exe
           cp ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release/warp-packer linux-x64.warp-packer
-          cp ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release/warp-packer linux-aarch64.warp-packer
+          # cp ${{ github.workspace }}/target/aarch64-unknown-linux-gnu/release/warp-packer linux-aarch64.warp-packer
           cp ${{ github.workspace }}/target/x86_64-apple-darwin/release/warp-packer macos-x64.warp-packer
           
           # linux/osx binaries are stripped in build-warp-packer step
@@ -555,7 +565,7 @@ jobs:
             windows-x86.warp-packer.exe
             windows-x64.warp-packer.exe
             linux-x64.warp-packer
-            linux-aarch64.warp-packer
+            # linux-aarch64.warp-packer
             macos-x64.warp-packer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
