@@ -7,6 +7,11 @@
 | Github Actions | linux-latest, windows-latest, macos-latest | Branch: develop ![warp](https://github.com/fintermobilityas/warp/workflows/Rust/badge.svg?branch=develop) |
 | Github Actions | linux-latest, windows-latest, macos-latest | Branch: master ![warp](https://github.com/fintermobilityas/warp/workflows/Rust/badge.svg?branch=master) |
 
+**This repository was in turn forked from** [fintermobilityas/warp](https://github.com/fintermobilityas/warp) and has had the following changes applied. 
+
+- Added ability to specify the runner's cache extraction location by setting the `WARP_CACHE_DIR` env var before running a packed binary
+- Rebased **@DMcConnell**'s improvements (unique guid per build) onto **fintermobilityas**' more recently maintained fork ([fintermobilityas/warp](https://github.com/fintermobilityas/warp)).
+
 **This repository was forked from** [dgiagio/warp](https://github.com/dgiagio/warp) because the original author stopped maintaining the project.
 
 Warp lets you create self-contained single binary applications making it simpler and more ergonomic to deliver your application to your customers. A self-contained binary is specially convenient when the technology you use, such as Node.js, .NET Core, Java and others, contain many dependencies that must be shipped alongside your application.
